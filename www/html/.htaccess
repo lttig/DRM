@@ -1,0 +1,6 @@
+RewriteEngine On
+# RewriteRule ^(directory)/([^/.]+)/?$ /$1/index.php?id=$2 [L,NC,QSA]
+# RewriteRule ^(/upload_input_content)/([^/.]+)/?$ /$1/index.php?id=$2 [L,NC,QSA]
+RewriteRule ^(upload_input_content)$ /upload.php [L,NC,QSA]
+RewriteRule ^(packaged_content)$ /packaged_content.php [L,NC,QSA]
+RewriteRule ^(packaged_content)/([^/.]+)$ /show.php?content_id=$2 [L,NC,QSA]
