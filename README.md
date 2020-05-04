@@ -13,7 +13,7 @@ Key : hyN9IKGfWKdAwFaE5pm0qg<br />
 Key ID : oW5AK5BW43HzbTSKpiu3SQ</code></pre>
 5. Obtain the necessary data from a completed packaging task<br />
 <pre><code>http://localhost:8080/packaged_content/55</code></pre>
-6. Play video<br />
+6. Play video<br /> (tested with Firefox 75.0 (64-bit))
 <pre><code>http://localhost:8080/play.php</code></pre>
 <h4>Bibliography</h4><br />
 https://github.com/Dash-Industry-Forum/dash.js/wiki/Generate-MPEG-DASH-content-encrypted-with-MPEG-CENC-ClearKey
