@@ -1,26 +1,39 @@
 <?php
-    
+
+include 'config/vars.php';    
+
 if (isset($_POST["input_content_id"])) {
     if (is_numeric($_POST["input_content_id"])) {
-        # supplementary checks required for "key" and "kid" parameters
-        $uploaded_id = $_POST["input_content_id"];
-    
-        # this parameter should be looked up as a mysqli_insert_id($connection);
-        $generated_id = 55;
-    
-        # these values should be generated like this "openssl rand -hex 16"
-        $key_hex    = bin2hex(base64_decode($_POST["key"]));
-        $key_id_hex = bin2hex(base64_decode($_POST["kid"]));
-    
+        $uploaded_id = (int) $_POST["input_content_id"];
+
+        # Generate new content id
+        $content_id = (int) file_get_contents($packaged_content_id_file);
+        $content_id++;
+
+        $key_hex    = rtrim(bin2hex(base64_decode($_POST["key"])), '=');
+        $key_id_hex = rtrim(bin2hex(base64_decode($_POST["kid"])), '=');
         exec(
-            "/var/www/scripts/package.sh $uploaded_id $generated_id $key_id_hex $key_hex",
+            "/var/www/scripts/package.sh $uploaded_id $content_id $key_id_hex $key_hex",
             $output,
             $result
         );
-        # Scripted executed sucessfully or not
+        # Script executed sucessfully or not
         if ($result == 0) {
+
+            # Write new content id
+            file_put_contents($packaged_content_id_file, $content_id);
+
+	    # Write content id, key and kid in a file (or in a database)
+	    $new_video_keys = $content_id.",".$_POST['key'].",".$_POST['kid'].PHP_EOL;
+            file_put_contents($content_keys_file, $new_video_keys, FILE_APPEND);
+
+	    # Delete unencrypted files
+	    unlink ("temp/$uploaded_id.mp4");
+	    unlink ("temp/$uploaded_id-video-fragmented.mp4");
+
+	    # Send id for the new packaged content
             $generated_video_id_array = 
-                array("packaged_content_id" => 55);
+                array("packaged_content_id" => $content_id);
             header("Content-Type: application/json");
             echo json_encode($generated_video_id_array);
         } else {

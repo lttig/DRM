@@ -1,3 +1,25 @@
+<?php
+
+include "config/vars.php";
+
+if ($_GET["content_id"] && is_numeric($_GET["content_id"])) {
+    $content_id = $_GET["content_id"];
+
+    # Retrieve "key" and "kid" (could be retrieved from a database)
+    $file = fopen($content_keys_file,"r");
+    $found = 0;
+    while(! feof($file)) {
+        list ($video_id, $key, $key_id) = explode(',',rtrim(fgets($file)));
+        if ($content_id == $video_id) {
+          $found=1;
+          break;
+        }
+    }
+    fclose($file);
+
+    if ($found) {
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,13 +33,13 @@
             const protData = {
                 "org.w3.clearkey": {
                     "clearkeys": {
-                        "oW5AK5BW43HzbTSKpiu3SQ": "hyN9IKGfWKdAwFaE5pm0qg"
+                        <?php echo "\"$key\": \"$key_id\""; ?>
                     }
                 }
             };
             var video,
                 player,
-                url = "/encrypted_videos/55/stream.mpd";
+                url = "/encrypted_videos/<?php echo $content_id; ?>/stream.mpd";
 
             video = document.querySelector("video");
             player = dashjs.MediaPlayer().create();
@@ -45,3 +67,11 @@
 </script>
 </body>
 </html>
+<?php
+    } else { 
+        die("video not found");
+    }
+} else { 
+    die("video not found");
+}
+?>
